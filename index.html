@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--
+  Filename: index.html
+  Search research: sugargo.net emphasizes category browsing, sugargooo.com
+  combines product search and QC content, and sugargoo.work/spreadsheet/
+  offers a filterable table with dated price references. This page combines
+  crawlable product rows, category and price filters, source item IDs, and
+  a landed-cost calculator that works without an account.
+  Indexing status: pending. A public deployment URL and verified site
+  access are needed. After deployment, set the canonical URL to the live
+  homepage, request indexing in Google Search Console URL Inspection, and
+  submit the same URL in Bing Webmaster Tools URL Submission.
+  https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl
+  https://www.bing.com/webmasters/help/URL-Submission-62f2860b
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="index,follow">
+  <title>Sugargoo spreadsheet | Product Finds &amp; Shipping Costs</title>
+  <meta name="description" content="Browse a Sugargoo spreadsheet with HipobuyFind listings, filter by category and CNY price, and estimate your total order cost before buying.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Sugargoo spreadsheet | Product Finds &amp; Shipping Costs">
+  <meta property="og:description" content="Compare HipobuyFind listings and estimate item, shipping and service costs in one place.">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f7ef;
+      --ink: #18382f;
+      --muted: #496258;
+      --line: #cedbd0;
+      --dark: #133a2d;
+      --lime: #d7f787;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 1rem/1.6 system-ui, sans-serif;
+    }
+    a { color: inherit; text-underline-offset: .2em; }
+    :focus-visible { outline: 3px solid #7e6500; outline-offset: 4px; }
+    [hidden] { display: none !important; }
+    .wrap { width: min(1080px, calc(100% - 2rem)); margin-inline: auto; }
+    .site-nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: .5rem 1.5rem;
+      padding: 1rem 0;
+    }
+    .hero {
+      text-align: center;
+      color: #fff;
+      background: var(--dark);
+      border-radius: 1.6rem;
+      padding: clamp(2.75rem, 8vw, 6rem) 1.25rem;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 { font-family: Georgia, serif; line-height: 1.08; }
+    h1 { margin-bottom: 1rem; font-size: clamp(2.5rem, 7vw, 5.3rem); letter-spacing: -.055em; }
+    h2 { margin-bottom: .65rem; font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: -.035em; }
+    .hero p { max-width: 39rem; margin: 0 auto 1.5rem; color: #e0eee4; }
+    .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .75rem; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.8rem;
+      padding: .55rem 1.05rem;
+      border: 1px solid transparent;
+      border-radius: .5rem;
+      background: var(--lime);
+      color: #142c19;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary { border-color: #d8e7dd; background: transparent; color: #fff; }
+    .button:hover { filter: brightness(.94); }
+    .hero .destination { margin: .7rem auto 0; font-size: .85rem; }
+    .panel {
+      margin-block: 1.4rem;
+      padding: clamp(1rem, 3.5vw, 2rem);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 1.1rem;
+    }
+    .muted { color: var(--muted); }
+    .filters, .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+      gap: .9rem;
+      margin-block: 1rem;
+    }
+    label { display: grid; gap: .25rem; font-weight: 650; }
+    input, select {
+      min-width: 0;
+      width: 100%;
+      min-height: 2.75rem;
+      padding: .45rem .65rem;
+      border: 1px solid #879f92;
+      border-radius: .45rem;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+    .table-region { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    caption { text-align: left; padding-bottom: .75rem; color: var(--muted); }
+    th, td { padding: .7rem .6rem; border-bottom: 1px solid var(--line); }
+    thead { background: #eaf1e7; }
+    td:last-child, th:last-child { text-align: right; white-space: nowrap; }
+    td:last-child { font-variant-numeric: tabular-nums; }
+    #listing-count, #estimate { margin: .75rem 0 0; }
+    output { display: block; font-weight: 700; }
+    details { padding: .75rem 0; border-top: 1px solid var(--line); }
+    summary { cursor: pointer; font-weight: 700; }
+    details p { margin: .5rem 0 0; }
+    footer { text-align: center; padding-block: .5rem 1.75rem; color: var(--muted); }
+    @media (max-width: 32rem) {
+      th, td { padding-inline: .4rem; }
+      .desktop-column { display: none; }
+    }
+  </style>
+<link rel="canonical" href="https://kakobuyfinds.github.io/qnbnc/">
+</head>
+<body>
+  <header class="wrap">
+    <nav class="site-nav" aria-label="Page sections">
+      <a href="#catalog">Product directory</a>
+      <a href="#cost">Cost calculator</a>
+      <a href="#guide">Buying guide</a>
+    </nav>
+    <div class="hero">
+      <h1>Sugargoo spreadsheet</h1>
+      <p>Compare shoes, hoodies, T-shirts and jackets from HipobuyFind. Check the source listing and estimate your total before ordering through a shopping agent.</p>
+      <div class="actions">
+        <a class="button" href="https://hipobuyfind.com/" aria-label="Sugargoo spreadsheet — open HipobuyFind">Sugargoo spreadsheet</a>
+        <a class="button secondary" href="https://hipobuyfind.com/" aria-label="Buy it now — open HipobuyFind">Buy it now</a>
+      </div>
+      <p class="destination">Both links open HipobuyFind.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel" id="catalog" aria-labelledby="catalog-title">
+      <h2 id="catalog-title">HipobuyFind product directory</h2>
+      <p class="muted">This selection comes from the HipobuyFind public catalog. Open a listing to confirm the current price, stock and size options.</p>
+
+      <div class="filters" id="catalog-filters" hidden>
+        <label>Product name or item ID
+          <input id="product-query" type="search" placeholder="Hoodie or 154917">
+        </label>
+        <label>Category
+          <select id="product-category">
+            <option value="">All categories</option>
+            <option value="shoes">Shoes</option>
+            <option value="hoodies">Hoodies</option>
+            <option value="tees">T-shirts</option>
+            <option value="jackets">Jackets</option>
+          </select>
+        </label>
+        <label>Maximum item price (CNY)
+          <input id="maximum-price" type="number" min="0" step="0.01" placeholder="Any price">
+        </label>
+      </div>
+
+      <div class="table-region" role="region" aria-label="HipobuyFind product listings" tabindex="0">
+        <table>
+          <caption>Reference item prices in CNY. Shipping and fees are extra.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col" class="desktop-column">Category</th>
+              <th scope="col" class="desktop-column">Item ID</th>
+              <th scope="col">CNY</th>
+            </tr>
+          </thead>
+          <tbody id="catalog-rows">
+            <tr data-category="shoes" data-price="450">
+              <th scope="row"><a href="https://hipobuyfind.com/goods-148188.html">Black Canvas Low-Top Sneakers with Gum Sole</a></th>
+              <td class="desktop-column">Shoes</td>
+              <td class="desktop-column">148188</td>
+              <td>¥450.00</td>
+            </tr>
+            <tr data-category="hoodies" data-price="170">
+              <th scope="row"><a href="https://hipobuyfind.com/goods-154917.html">Fleece-Lined Hoodie</a></th>
+              <td class="desktop-column">Hoodies</td>
+              <td class="desktop-column">154917</td>
+              <td>¥170.00</td>
+            </tr>
+            <tr data-category="tees" data-price="105">
+              <th scope="row"><a href="https://hipobuyfind.com/goods-154920.html">Graphic Short-Sleeve T-Shirt</a></th>
+              <td class="desktop-column">T-shirts</td>
+              <td class="desktop-column">154920</td>
+              <td>¥105.00</td>
+            </tr>
+            <tr data-category="jackets" data-price="157.14">
+              <th scope="row"><a href="https://hipobuyfind.com/goods-154851.html">Hooded Quick-Dry Jacket</a></th>
+              <td class="desktop-column">Jackets</td>
+              <td class="desktop-column">154851</td>
+              <td>¥157.14</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="listing-count" class="muted" role="status" hidden></p>
+      <p><a href="https://hipobuyfind.com/">Browse the full HipobuyFind catalog</a></p>
+    </section>
+
+    <section class="panel" id="cost" aria-labelledby="cost-title">
+      <h2 id="cost-title">Estimate your order cost</h2>
+      <p>Enter your quotes in CNY. Use the agent’s international shipping estimate for your destination and parcel size. Include any known taxes, duties or payment fees.</p>
+      <p id="cost-formula">Estimated total = item subtotal + domestic shipping + international shipping + fees and taxes.</p>
+      <form id="cost-form" aria-describedby="cost-formula" hidden>
+        <div class="fields">
+          <label>Item subtotal
+            <input name="items" type="number" min="0" step="0.01" required>
+          </label>
+          <label>Domestic shipping
+            <input name="domestic" type="number" min="0" step="0.01" value="0" required>
+          </label>
+          <label>International shipping
+            <input name="international" type="number" min="0" step="0.01" required>
+          </label>
+          <label>Fees and taxes
+            <input name="fees" type="number" min="0" step="0.01" value="0" required>
+          </label>
+        </div>
+        <button class="button" type="submit">Calculate estimate</button>
+        <output id="estimate" role="status"></output>
+      </form>
+    </section>
+
+    <section class="panel" id="guide" aria-labelledby="guide-title">
+      <h2 id="guide-title">How to use a Sugargoo spreadsheet</h2>
+      <ol>
+        <li>Open the product page and confirm the seller listing, variant, size chart and current price.</li>
+        <li>If the product page provides an original marketplace URL, open it in your shopping agent and confirm that the agent accepts the listing before paying.</li>
+        <li>If warehouse photos are available, compare them with the ordered variant. For shoes, check the size label and sole. For clothing, check the tag, color and measurements.</li>
+        <li>Confirm the parcel weight, dimensions and shipping quote when the items reach the warehouse. Review the seller and agent return deadlines before approving shipment.</li>
+      </ol>
+      <details>
+        <summary>What is a Sugargoo spreadsheet?</summary>
+        <p>It is a shopping reference that organizes product finds into a list you can browse before placing an agent order. This independent page lists items from HipobuyFind. Product links open their HipobuyFind listings.</p>
+      </details>
+      <details>
+        <summary>Why can the total cost change at the warehouse?</summary>
+        <p>Shipping can depend on the packed parcel’s weight and dimensions. Packaging, optional services and destination charges can change the amount you pay. Use the final quote for your parcel before confirming shipment.</p>
+      </details>
+      <details>
+        <summary>What if a product link or size is unavailable?</summary>
+        <p>Search the HipobuyFind catalog by item ID or product name, then confirm availability on the source listing. Check the new seller’s size chart if you choose a replacement.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="wrap">Independent shopping guide. Product directory source: <a href="https://hipobuyfind.com/">HipobuyFind</a>.</footer>
+
+  <script>
+    const filters = document.querySelector("#catalog-filters");
+    const query = document.querySelector("#product-query");
+    const category = document.querySelector("#product-category");
+    const maximum = document.querySelector("#maximum-price");
+    const rows = Array.from(document.querySelectorAll("#catalog-rows tr"));
+    const count = document.querySelector("#listing-count");
+
+    function filterCatalog() {
+      const term = query.value.trim().toLowerCase();
+      const ceiling = maximum.valueAsNumber;
+      let visible = 0;
+
+      for (const row of rows) {
+        const matchesText = row.textContent.toLowerCase().includes(term);
+        const matchesCategory = !category.value || row.dataset.category === category.value;
+        const matchesPrice = Number.isNaN(ceiling) || Number(row.dataset.price) <= ceiling;
+        row.hidden = !(matchesText && matchesCategory && matchesPrice);
+        if (!row.hidden) visible += 1;
+      }
+
+      count.textContent = visible
+        ? `Showing ${visible} of ${rows.length} listings.`
+        : "No listings match these filters.";
+    }
+
+    query.addEventListener("input", filterCatalog);
+    category.addEventListener("change", filterCatalog);
+    maximum.addEventListener("input", filterCatalog);
+    filters.hidden = false;
+    count.hidden = false;
+    filterCatalog();
+
+    const costForm = document.querySelector("#cost-form");
+    const estimate = document.querySelector("#estimate");
+    const cny = new Intl.NumberFormat("en", {
+      style: "currency",
+      currency: "CNY",
+      currencyDisplay: "code"
+    });
+
+    costForm.addEventListener("input", () => { estimate.value = ""; });
+    costForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const amounts = new FormData(costForm);
+      const totalInFen = Array.from(amounts.values()).reduce(
+        (sum, amount) => sum + Math.round(Number(amount) * 100),
+        0
+      );
+      estimate.value = Number.isSafeInteger(totalInFen)
+        ? `Estimated order total: ${cny.format(totalInFen / 100)}`
+        : "Enter a smaller amount to calculate an estimate.";
+    });
+    costForm.hidden = false;
+  </script>
+</body>
+</html>
